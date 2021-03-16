@@ -17,7 +17,14 @@ const generateRandomString = (callback) => {
   }
   return randomString;
 };
-// cite https://coderrocketfuel.com/article/generate-a-random-letter-from-the-alphabet-using-javascript
+app.post("/urls/:shortURL/delete", (req, res) => {
+  const key = req.params.shortURL;
+  console.log("Deleting shortURL: " + key);
+  delete urlDatabase[key];
+  res.redirect("/urls");
+});
+
+
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Logs the POST request body to the console
   const shortURL = generateRandomString(getRandomChar);
@@ -32,7 +39,15 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
-
+app.get("/urls/:shortURL", (req, res) => {
+  let key = req.params.shortURL;
+  key = key.replace(/:/g, '');
+  const templateVars = {
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[key] 
+    };
+  res.render("urls_show", templateVars);
+});
 
 
 app.get("/", (req, res) => {
@@ -46,12 +61,11 @@ app.listen(PORT, () => {
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
+});
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
 });
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];

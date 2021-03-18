@@ -17,21 +17,37 @@ const generateRandomString = (callback) => {
   }
   return randomString;
 };
+
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+app.get("/hello", (req, res) => {
+  res.send("<html><body>Hello <b>World</b></body></html>\n");
+});
+app.post("/urls", (req, res) => {
+  // console.log(req.body);  // Logs the POST request body to the console
+  const shortURL = generateRandomString(getRandomChar);
+  urlDatabase[shortURL] = req.body.longURL;
+  res.redirect(`/urls/${shortURL}`);       
+});
+
+app.post('/urls/:shortURL/edit', (req, res) => {
+  const shortURL = req.params.shortURL;
+  res.redirect(`/urls/${shortURL}`);
+});
+
+app.post('/urls/:shortURL/update', (req, res) => {
+  const shortURL = req.params.shortURL;
+  urlDatabase[shortURL] = req.body.urlupdate;
+  res.redirect(`/urls${shortURL}`);
+});
+
 app.post("/urls/:shortURL/delete", (req, res) => {
   const key = req.params.shortURL;
   console.log("Deleting shortURL: " + key);
   delete urlDatabase[key];
   res.redirect("/urls");
 });
-
-
-app.post("/urls", (req, res) => {
-  console.log(req.body);  // Logs the POST request body to the console
-  const shortURL = generateRandomString(getRandomChar);
-  urlDatabase[shortURL] = req.body.longURL;
-  res.redirect(`/urls/${shortURL}`);       
-});
-
 app.set("view engine", "ejs");
 //Tells Express to use EJS as engine
 
@@ -58,12 +74,8 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
-});
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
+
+
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });

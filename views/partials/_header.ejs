@@ -10,16 +10,21 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
-    <form method="POST" action="/login">
-      <label for="username">Username: </label>
-      <input id="username" name="username">
-      <button class="button" type="submit" value="Submit">
-        <div class="pattern">
-          <div class="target inner bg4"></div>
-        </div>
-        <div class="text">Sign-In</div>
-      </button>
+    <% if (username === undefined) { %>
+      <form method="POST" action="/login">
+        <label for="username">Username:</label>
+        <input id="username" name="username">
+         <button class="button" type="submit" value="Submit">
+          <div class="pattern">
+        <div class="target inner bg4"></div>
+       </div>
+      <div class="text">Sign-In</div>
+    </button>
     </form>
+    <% } %>
+    <% if (username !== undefined) { %>
+    <h4 class="nav navbar"><%= username %></h4>
+    <% } %>
     <form method="POST" action="/logout">
       <button class="button" type="submit" value="Submit">
         <div class="pattern">
@@ -28,8 +33,5 @@
         <div class="text">Logout</div>
       </button>
     </form>
-    <% if (username !== undefined) { %>
-    <h4 class="nav navbar"><%= username %></h4>
-    <% } %>
   </nav>
 </header>

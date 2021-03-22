@@ -1,4 +1,4 @@
-const { getRandomChar, generateRandomString, validator, getUserByEmail, urlsForUser } = require('./helpers');
+const { urlDatabase, users, getRandomChar, generateRandomString, verification, getUserByEmail, urlsForUser } = require('./helpers');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
@@ -12,14 +12,15 @@ app.use(cookieSession({
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
 
-const urlDatabase = {
-  "b2xVn2": {longURL: "http://www.lighthouselabs.ca", userId: "1a1a1a"},
-  "9sm5xK": {longURL: "http://www.google.com", userId: "2b2b2b"}
-};
 
-const users = {
-  
-};
+app.get('/', (req, res) => {
+  const userID = req.session.user_id;
+  if (!userID) {
+    return res.redirect("/login");
+  } else {
+    return res.redirect("/urls");
+  }
+});
 
 app.get('/urls/new', (req, res) => {
   const templateVars = { user: users[req.session.user_id] };
@@ -42,14 +43,17 @@ app.get('/urls/:shortURL', (req, res) => {
   const templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL] && urlDatabase[req.params.shortURL]['longURL'],
-    user: users[req.session.user_id]
+    user: users[req.session.user_id],
+    owner: true
   };
-  if (!templateVars.user || !(urlsForUser(templateVars.user['id'])[templateVars.shortURL])) {
-    res.redirect('/login');
+  if (templateVars.user && !(urlsForUser(templateVars.user['id'], urlDatabase)[templateVars.shortURL])) {
+    templateVars['owner'] = false;
+    res.render("urls_show", templateVars);
     return;
   }
-  res.render('urls_show', templateVars);
+  res.render("urls_show", templateVars);
 });
+
 
 app.get('/u/:shortURL', (req, res) => {
   const shortURL = req.params.shortURL;
@@ -57,14 +61,15 @@ app.get('/u/:shortURL', (req, res) => {
   res.redirect(longURl);
 });
 
-app.get('*', (req, res) => {
-  const veri = { user: users[req.session.user_id] };
-  if (veri.user) {
-    res.redirect('/urls');
-    return;
-  }
-  res.redirect('/login');
-});
+// app.get('/', (req, res) => {
+//   const vari = { user: users[req.session.user_id] };
+//   if (vari.user) {
+//     res.redirect('/urls');
+//     return;
+//   } else if (includes('https://', 'http://' )) {
+//     res.redirect('login');
+//   }
+// });
 
 app.get('/register', (req, res) => {
   const templateVars = { user: users[req.session.user_id], valid: true};
@@ -111,7 +116,6 @@ app.post('/register', (req, res) => {
     const id = generateRandomString(getRandomChar);
     users[id] = { id, email, password };
     req.session.user_id = id;
-    console.log('user id cookie', req.session.user_id);
     res.redirect('/urls');
   }
 });
@@ -127,29 +131,29 @@ app.post('/urls/:shortURL/edit', (req, res) => {
   res.redirect(`/urls/${shortURL}`);
 });
 
-app.post('/urls/:shortURL/update', (req, res) => {
-  const veri = {
+app.post('/urls/:shortURL/', (req, res) => {
+  const vari = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL] && urlDatabase[req.params.shortURL]['longURL'],
     user: users[req.session.user_id] };
-  if (!veri.user || !(urlsForUser(veri.user['id'])[veri.shortURL])) {
+  if (!vari.user || !(urlsForUser(vari.user['id'], urlDatabase)[vari.shortURL])) {
     res.redirect('/login');
     return;
   }
-  urlDatabase[veri.shortURL]['longURL'] = req.body.urlupdate;
-  res.redirect(`/urls/${veri.shortURL}`);
+  urlDatabase[vari.shortURL]['longURL'] = req.body.urlupdate;
+  res.redirect('/urls');
 });
 
 app.post('/urls/:shortURL/delete', (req, res) => {
-  const veri = {
+  const vari = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL] && urlDatabase[req.params.shortURL]['longURL'],
     user: users[req.session.user_id] };
-  if (!veri.user || !(urlsForUser(veri.user['id'])[veri.shortURL])) {
+  if (!vari.user || !(urlsForUser(vari.user['id'])[vari.shortURL])) {
     res.redirect('/login');
     return;
   }
-  delete urlDatabase[veri.shortURL];
+  delete urlDatabase[vari.shortURL];
   res.redirect('/urls');
 });
 

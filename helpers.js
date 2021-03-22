@@ -1,3 +1,11 @@
+const urlDatabase = {
+  // "b2xVn2": {longURL: "http://www.lighthouselabs.ca", userId: "1a1a1a"},
+  // "9sm5xK": {longURL: "http://www.google.com", userId: "2b2b2b"}
+};
+const users = {
+  
+};
+
 const verification = (userProperty, reqBody) => {
   for (const user in users) {
     if (reqBody[userProperty] === users[user][userProperty]) {
@@ -6,6 +14,7 @@ const verification = (userProperty, reqBody) => {
   }
   return true;
 };
+
 
 const getRandomChar = (string) => {
   return Math.floor(Math.random() * string.length);
@@ -38,9 +47,11 @@ const getUserByEmail = (email, database) => {
   }
 };
 
-module.exports = { 
+module.exports = {
+  users,
+  urlDatabase,
   getRandomChar,
   generateRandomString,
   verification,
   getUserByEmail,
-  urlsForUser }; 
+  urlsForUser };

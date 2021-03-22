@@ -19,19 +19,19 @@
       <div class="card-body">
         <h1 class="card-title">Sign up</h1>
         <% if (!valid) { %>
-          <p>Status 400: Invalid email or password, please reenter</p>
+          <p>Status 400: Invalid email or password, please re-enter</p>
         <% } %>
         <form id="register" method="POST" action="/register">
-          <label for="email">Enter Email here</label>
+          <label for="email">Enter Email</label>
           <br>
-          <input type="email" placeholder="Enter email" name=email>
+          <input type="email" placeholder="Enter email here" name=email>
           <br>
-          <label for="password">Enter Password here</label>
+          <label for="password">Enter Password</label>
           <br>
-          <input type="password" placeholder="password" name="password">
+          <input type="password" placeholder="Enter password here" name="password">
           <br>
           <br>
-          <button type="submit" value="submit" class="btn btn-primary">Click here to Register</button>
+          <button class="btn btn-default" type="submit" value="submit" >Submit</button>
         </form>
     </div>
   </div>

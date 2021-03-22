@@ -1,3 +1,4 @@
+const { getRandomChar, generateRandomString, validator, getUserByEmail, urlsForUser } = require('./helpers');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
@@ -19,46 +20,6 @@ const urlDatabase = {
 const users = {
   
 };
-const verification = (userProperty, reqBody) => {
-  for (const user in users) {
-    if (reqBody[userProperty] === users[user][userProperty]) {
-      return false;
-    }
-  }
-  return true;
-};
-
-const getRandomChar = (string) => {
-  return Math.floor(Math.random() * string.length);
-};
-
-const generateRandomString = (callback) => {
-  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxy';
-  let randomString = '';
-  for (let i = 0; i < 6; i++) {
-    randomString += letters[callback(letters)];
-  }
-  return randomString;
-};
-
-const urlsForUser = (id) => {
-  const myURLs = {};
-  for (let url in urlDatabase) {
-    if (urlDatabase[url].user === id) {
-      myURLs[url] = urlDatabase[url];
-    }
-  }
-  return myURLs;
-};
-
-const getUserByEmail = (email) => {
-  for (const user in users) {
-    if (email === users[user]['email']) {
-      return users[user]['id'];
-    }
-  }
-};
-
 
 app.get('/urls/new', (req, res) => {
   const templateVars = { user: users[req.session.user_id] };
@@ -96,6 +57,15 @@ app.get('/u/:shortURL', (req, res) => {
   res.redirect(longURl);
 });
 
+app.get('*', (req, res) => {
+  const veri = { user: users[req.session.user_id] };
+  if (veri.user) {
+    res.redirect('/urls');
+    return;
+  }
+  res.redirect('/login');
+});
+
 app.get('/register', (req, res) => {
   const templateVars = { user: users[req.session.user_id], valid: true};
   if (templateVars.user) {
@@ -114,17 +84,12 @@ app.post('/login', (req, res) => {
     res.sendStatus(403);
     return;
   }
-  // if (verification('password', req.body)) {
-  const id = getUserByEmail(req.body.email);
+  const id = getUserByEmail(req.body.email, users);
   const password = users[id]['password'];
   if (req.body.password && !bcrypt.compareSync(req.body.password, password)) {
     res.sendStatus(403);
     return;
   }
-  // const email = req.body.email;
-  // const password = req.body.password;
-  // const id = generateRandomString(getRandomChar);
-  // users[id] = { id, email, password };
   req.session.user_id = users[id]['id'];
   res.redirect('/urls');
 });

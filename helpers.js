@@ -1,6 +1,6 @@
 const urlDatabase = {
-  // "b2xVn2": {longURL: "http://www.lighthouselabs.ca", userId: "1a1a1a"},
-  // "9sm5xK": {longURL: "http://www.google.com", userId: "2b2b2b"}
+  "b2xVn2": {longURL: "http://www.lighthouselabs.ca", userId: "1a1a1a"},
+  "9sm5xK": {longURL: "http://www.google.com", userId: "2b2b2b"}
 };
 const users = {
   

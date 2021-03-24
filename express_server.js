@@ -46,30 +46,25 @@ app.get('/urls/:shortURL', (req, res) => {
     user: users[req.session.user_id],
     owner: true
   };
+  console.log("For show", urlDatabase, templateVars)
   if (templateVars.user && !(urlsForUser(templateVars.user['id'], urlDatabase)[templateVars.shortURL])) {
     templateVars['owner'] = false;
     res.render("urls_show", templateVars);
     return;
-  }
+  } 
   res.render("urls_show", templateVars);
 });
 
 
 app.get('/u/:shortURL', (req, res) => {
-  const shortURL = req.params.shortURL;
-  const longURl = urlDatabase[shortURL]['longURL'];
-  res.redirect(longURl);
+  if (urlDatabase[req.params.shortURL] === undefined) {
+    return res.status(404).send("Page does not exist");
+  } else {
+    const longUrl = urlDatabase[req.params.shortURL].longURL;
+    res.redirect(longUrl);
+  }
 });
 
-// app.get('/', (req, res) => {
-//   const vari = { user: users[req.session.user_id] };
-//   if (vari.user) {
-//     res.redirect('/urls');
-//     return;
-//   } else if (includes('https://', 'http://' )) {
-//     res.redirect('login');
-//   }
-// });
 
 app.get('/register', (req, res) => {
   const templateVars = { user: users[req.session.user_id], valid: true};
@@ -127,7 +122,9 @@ app.post('/urls', (req, res) => {
 });
 
 app.post('/urls/:shortURL/edit', (req, res) => {
+  const url = req.body.longURL;
   const shortURL = req.params.shortURL;
+  urlDatabase[shortURL].longURL = url;
   res.redirect(`/urls/${shortURL}`);
 });
 
@@ -139,8 +136,9 @@ app.post('/urls/:shortURL/', (req, res) => {
   if (!vari.user || !(urlsForUser(vari.user['id'], urlDatabase)[vari.shortURL])) {
     res.redirect('/login');
     return;
-  }
-  urlDatabase[vari.shortURL]['longURL'] = req.body.urlupdate;
+  } 
+  console.log(req.body)
+  urlDatabase[vari.shortURL]['longURL'] = req.body.longURL;
   res.redirect('/urls');
 });
 
